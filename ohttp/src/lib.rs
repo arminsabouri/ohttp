@@ -520,4 +520,23 @@ mod test {
         let response = client_response.decapsulate(&enc_response).unwrap();
         assert_eq!(&response[..], RESPONSE);
     }
+
+    #[test]
+    fn from_config_is_non_deterministic() {
+        init();
+
+        let server_config = KeyConfig::new(KEY_ID, KEM, Vec::from(SYMMETRIC)).unwrap();
+        let server = Server::new(server_config).unwrap();
+        let encoded_config = server.config().encode().unwrap();
+        let client = ClientRequest::from_encoded_config(&encoded_config).unwrap();
+
+        let client2 = ClientRequest::from_encoded_config(&encoded_config).unwrap();
+        assert_ne!(client.hpke.enc().unwrap(), client2.hpke.enc().unwrap());
+
+        let plaintext = b"foobar";
+        let (enc_request, client_response) = client.encapsulate(plaintext).unwrap();
+        let (enc_request2, client_response2) = client2.encapsulate(plaintext).unwrap();
+        assert_ne!(enc_request, enc_request2);
+        assert_ne!(client_response.hpke.enc().unwrap(), client_response2.hpke.enc().unwrap());
+    }
 }
