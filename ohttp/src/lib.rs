@@ -92,13 +92,13 @@ pub struct ClientRequest {
 #[cfg(feature = "client")]
 impl ClientRequest {
     /// Construct a `ClientRequest` from a specific `KeyConfig` instance.
-    pub fn from_config(config: &mut KeyConfig) -> Res<Self> {
+    pub fn from_config(config: &KeyConfig) -> Res<Self> {
         // TODO(mt) choose the best config, not just the first.
         let selected = config.select(config.symmetric[0])?;
 
         // Build the info, which contains the message header.
         let info = build_info(config.key_id, selected)?;
-        let hpke = HpkeS::new(selected, &mut config.pk, &info)?;
+        let hpke = HpkeS::new(selected, &config.pk, &info)?;
 
         let header = Vec::from(&info[INFO_REQUEST.len() + 1..]);
         debug_assert_eq!(header.len(), REQUEST_HEADER_LEN);

@@ -171,7 +171,7 @@ pub struct HpkeS {
 
 impl HpkeS {
     /// Create a new context that uses the KEM mode for sending.
-    pub fn new(config: Config, pk_r: &mut PublicKey, info: &[u8]) -> Res<Self> {
+    pub fn new(config: Config, pk_r: &PublicKey, info: &[u8]) -> Res<Self> {
         let mut csprng = rng();
 
         macro_rules! dispatch_hpkes_new {
